@@ -11,6 +11,10 @@ const SignIn= ({manualSetState})=>{
     }
     axios.post(route,cred)
     .then(res=>{
+      if(res.data.message!==undefined && Object.keys(res.data.message).length!==0){
+        alert(res.data.message);
+        return;
+      }
       if(res.data._id===undefined){
         alert('Invalid Credentials');
         return;

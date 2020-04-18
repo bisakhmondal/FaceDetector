@@ -13,15 +13,18 @@ const Register= ({manualSetState})=>{
     };
     axios.post(route,info)
     .then(res=>{
+      if(res.data.message!==undefined && Object.keys(res.data.message).length!==0){
+        alert(res.data.message);
+        return;
+      }
       if(res.data._id===undefined){
         alert('Invalid Credentials');
         return;
       }
       manualSetState('id',res.data._id);
-      manualSetState('name',res.data.name);
+      manualSetState('name',name);
       manualSetState('route','home');
       localStorage.setItem('_id',res.data._id);
-      console.log(res);
     })
     .catch(err=>{
       alert(err);

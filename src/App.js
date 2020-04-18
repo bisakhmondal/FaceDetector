@@ -10,6 +10,7 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm' ;
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
 import axios from 'axios';
+require('dotenv/config')
 const particleoptions={
   "particles": {
       "number": {
@@ -48,7 +49,7 @@ const app = new Clarifai.App({
     const _id=localStorage.getItem('_id');
     if(_id!==null){
       const route='https://faceb-backend.herokuapp.com/auth/'+String(_id);
-      console.log(route);
+
       axios.get(route)
       .then(res=>{
         // this.setState()
@@ -85,15 +86,16 @@ const app = new Clarifai.App({
   }
 
   onButtonSubmit=(url) =>{
-    if(url===this.state.image_url){
-      alert('Already Detected');
-      return;
-    }
+    // if(url===this.state.image_url){
+    //   alert('Already Detected');
+    //   return;
+    // }
     if(this.state.count>=20){
       alert('Quota exhausted');
       return;
     }
-    this.setState({image_url:url})
+    this.setState({image_url:url});
+    this.setState({box:[]});
     app.models.predict("a403429f2ddf4b49b307e318f00e528b", this.state.image_url).then((response) =>{
       this.setState({box:this.calcFacebox(response)});
       this.setState({count:this.state.count+1});
@@ -113,7 +115,7 @@ const app = new Clarifai.App({
     <Particles className='particles'
     params={particleoptions} />
 
-      <Navigation manualSetState={this.manualSetState} /> 
+      <Navigation id={this.state.id} manualSetState={this.manualSetState} /> 
       {(this.state.route==='home')?
       <div>
       <Logo/>
