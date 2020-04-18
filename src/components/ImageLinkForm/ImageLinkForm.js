@@ -5,7 +5,7 @@ const ImageLinkForm= (props)=>{
     return(
         <div>
        <p className='f3'>
-           {`I am Good at face detection, give me faces`}
+           {`I am Good at face detection, give me urls :)`}
        </p>
        <div className='center'>
        <div className='center linker pa4 br3 shadow-5'>

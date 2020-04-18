@@ -15,6 +15,9 @@
     "react-tilt": "^0.1.4",
     "tachyons": "^4.11.1"
   },
+  "engines": {
+    "node":"13.11.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
