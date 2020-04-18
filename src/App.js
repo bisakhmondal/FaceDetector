@@ -9,6 +9,7 @@ import Rank from './components/Rank/Rank' ;
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm' ;
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
+import axios from 'axios';
 const particleoptions={
   "particles": {
       "number": {
@@ -28,27 +29,49 @@ const particleoptions={
   }
 }
 const app = new Clarifai.App({
-  apiKey: ''
+  apiKey: 'e31c08df8a38427fa1c737613de07da1'
  });
  
  class App extends React.Component {
   constructor(){
     super();
     this.state={
-      input:'',
-      image_url:'',
+      id:'',
+      name:'',
       box:[],
+      count:0,
       route:'signin',
-      isSigned:false
+      image_url:''
     }
   }
-  onChange=(event)=>{
-    this.setState({input:event.target.value});
+  componentDidMount(){
+    const _id=localStorage.getItem('_id');
+    if(_id!==null){
+      const route='https://faceb-backend.herokuapp.com/auth/'+String(_id);
+      console.log(route);
+      axios.get(route)
+      .then(res=>{
+        // this.setState()
+        // if(res.)
+        this.setState({id:_id,isSigned:true,route:"home"
+        ,name:res.data.name,count:res.data.count});
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    }
   }
+  // onChange=(event)=>{
+  //   this.setState({input:event.target.value});
+  // }
+
+  manualSetState=(ke,val)=>{
+    this.setState({[ke]:val});
+  }
+
+  SetId=(ids)=> this.setState({id:ids});
   calcFacebox=(data)=>{
     let b_boxes=data.outputs[0].data.regions.map(i=>i.region_info.bounding_box);
-    // console.log(b_boxes);
-    // // b_box=b_box[0];
     const image=document.getElementById('inputImage');
     const height=Number(image.height);
     const width=Number(image.width);
@@ -60,25 +83,28 @@ const app = new Clarifai.App({
       }));
       return box_list;
   }
-  drawFacebox=(box)=>{
-    // console.log(box);
-    this.setState({box:box});
-  }
 
-  onButtonSubmit=(event) =>{
-    this.setState({image_url:this.state.input})
+  onButtonSubmit=(url) =>{
+    if(url===this.state.image_url){
+      alert('Already Detected');
+      return;
+    }
+    if(this.state.count>=20){
+      alert('Quota exhausted');
+      return;
+    }
+    this.setState({image_url:url})
     app.models.predict("a403429f2ddf4b49b307e318f00e528b", this.state.image_url).then((response) =>{
-      this.drawFacebox(this.calcFacebox(response))
-    }).catch(err => console.log(err));
-  }
-  onRouteChange=(route)=>{
-    if(route==='home'){
-      this.setState({isSigned:true});
-    }
-    else{
-      this.setState({isSigned:false});
-    }
-    this.setState({route:route})
+      this.setState({box:this.calcFacebox(response)});
+      this.setState({count:this.state.count+1});
+      const route='https://faceb-backend.herokuapp.com/predict/'+String(this.state.id);
+      const info={
+        url:url,
+        count:this.state.count
+      }
+      axios.put(route,info)
+      .then(res=>{})
+    }).catch(err=>{});
   }
 
   render(){
@@ -87,17 +113,17 @@ const app = new Clarifai.App({
     <Particles className='particles'
     params={particleoptions} />
 
-      <Navigation onRouteChange={this.onRouteChange} isSigned={this.state.isSigned} /> 
+      <Navigation manualSetState={this.manualSetState} /> 
       {(this.state.route==='home')?
       <div>
       <Logo/>
-      <Rank />
-      <ImageLinkForm onInputChange={this.onChange} onButtonSubmit={this.onButtonSubmit}/>
+      <Rank name={this.state.name} count={this.state.count} />
+      <ImageLinkForm onButtonSubmit={this.onButtonSubmit}/>
       <FaceRecognition boxes={this.state.box} imageURL={this.state.image_url}/>
       </div>
       :( (this.state.route==='signin')?
-      <SignIn onRouteChange={this.onRouteChange} /> :
-      <Register onRouteChange={this.onRouteChange}/>
+      <SignIn  manualSetState={this.manualSetState} /> :
+      <Register manualSetState={this.manualSetState}/>
       )
       }
     </div>
