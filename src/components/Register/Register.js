@@ -5,7 +5,7 @@ const Register= ({manualSetState})=>{
   const [name,setName] =useState('');  
   const [passwd,setPasswd] =useState('');  
   const Authenticate=()=>{
-    const route='https://faceb-backend.herokuapp.com/register';
+    const route=process.env.REACT_APP_BACKEND+'/register';
     const info={
       name:name,
       email:email,

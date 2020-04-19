@@ -29,8 +29,9 @@ const particleoptions={
       }
   }
 }
+const cla_api_key=process.env.REACT_APP_CLARIFAI_KEY;
 const app = new Clarifai.App({
-  apiKey: 'e31c08df8a38427fa1c737613de07da1'
+  apiKey: cla_api_key
  });
  
  class App extends React.Component {
@@ -48,8 +49,7 @@ const app = new Clarifai.App({
   componentDidMount(){
     const _id=localStorage.getItem('_id');
     if(_id!==null){
-      const route='https://faceb-backend.herokuapp.com/auth/'+String(_id);
-
+      const route=process.env.REACT_APP_BACKEND+'/auth/'+String(_id);
       axios.get(route)
       .then(res=>{
         // this.setState()
@@ -99,7 +99,7 @@ const app = new Clarifai.App({
     app.models.predict("a403429f2ddf4b49b307e318f00e528b", this.state.image_url).then((response) =>{
       this.setState({box:this.calcFacebox(response)});
       this.setState({count:this.state.count+1});
-      const route='https://faceb-backend.herokuapp.com/predict/'+String(this.state.id);
+      const route=process.env.REACT_APP_BACKEND+'/predict/'+String(this.state.id);
       const info={
         url:url,
         count:this.state.count
